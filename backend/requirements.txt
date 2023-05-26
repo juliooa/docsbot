@@ -1,0 +1,4 @@
+Flask
+flask_cors
+openai
+chromadb
