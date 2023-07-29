@@ -6,10 +6,8 @@ document_id = 1
 
 
 def process_files(documents):
-    chroma_client = chromadb.Client(Settings(chroma_db_impl="duckdb+parquet",
-                                             persist_directory="local_db"
-                                             ))
-    collection = chroma_client.get_or_create_collection(name="docs_rust_collection")
+    chroma_client = chromadb.PersistentClient(path='local_db')
+    collection = chroma_client.create_collection(name="test_collection_one")
 
     for file in documents:
         print("processing file: " + file.filename)
@@ -17,7 +15,7 @@ def process_files(documents):
         chunks = split_text(markdown_text)
         document_title = get_title(markdown_text)
         generate_embeddings(chunks, document_title, file.filename, collection)
-    chroma_client.persist()
+    chroma_client.stop()
 
 
 def generate_embeddings(chunks, document_title, file_name, collection):
@@ -49,11 +47,13 @@ def split_text(file):
 
 
 def query_collection(query):
-    chroma_client = chromadb.Client(Settings(chroma_db_impl="duckdb+parquet",
-                                             persist_directory="local_db"
-                                             ))
-    collection = chroma_client.get_or_create_collection(name="my_collection")
-    return collection.query(
+    chroma_client = chromadb.PersistentClient(path='local_db')
+    collection = chroma_client.get_collection(name="test_collection_one")
+    results = collection.query(
         query_texts=[query],
         n_results=2,
     )
+    chroma_client.stop()  # Cierra la conexión después de usarla
+    return results
+
+
