@@ -6,7 +6,7 @@ document_id = 1
 
 
 def process_files(documents):
-    chroma_client = chromadb.Client()
+    chroma_client = chromadb.PersistentClient(path='local_db')
     collection = chroma_client.create_collection(name="test_collection_one")
 
     for file in documents:
@@ -47,7 +47,7 @@ def split_text(file):
 
 
 def query_collection(query):
-    chroma_client = chromadb.Client()
+    chroma_client = chromadb.PersistentClient(path='local_db')
     collection = chroma_client.get_collection(name="test_collection_one")
     results = collection.query(
         query_texts=[query],
